@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name        Apache Server Status for Human
+// @downloadURL https://raw.github.com/mfayevpg/GM_ModStatusForHuman/master/Apache_Server_Status_for_Human.user.js
 // @namespace   maximefaye.wordpress.com
 // @include     http://*/server-status
 // @require     https://raw.github.com/mfayevpg/GM_ModStatusForHuman/master/jquery.min.js
