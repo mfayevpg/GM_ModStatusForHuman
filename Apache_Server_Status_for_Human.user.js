@@ -32,16 +32,33 @@ var serverStatusFilters = {
     currentClientIpAddress: '10.13.11.111'
 };
 
+var ThreadData = function(threadDataArray){
+    this.Srv    = $(threadDataArray[0] ).text();
+    this.PID    = $(threadDataArray[1] ).text();
+    this.Acc    = $(threadDataArray[2] ).text();
+    this.M      = $(threadDataArray[3] ).text();
+    this.CPU    = $(threadDataArray[4] ).text();
+    this.SS     = $(threadDataArray[5] ).text();
+    this.Req    = $(threadDataArray[6] ).text();
+    this.Conn   = $(threadDataArray[7] ).text();
+    this.Child  = $(threadDataArray[8] ).text();
+    this.Slot   = $(threadDataArray[9] ).text();
+    this.Client = $(threadDataArray[10]).text();
+    this.VHost  = $(threadDataArray[11]).text();
+    this.Request= $(threadDataArray[12]).text();
+};
+
 function checkFilter(threadData, serverStatusFilters){
     var out = checkNotNullFilter(threadData, serverStatusFilters);
     out = (out && checkClientFilter(threadData, serverStatusFilters));
+
     return out;
 }
 
 function checkClientFilter(threadData, serverStatusFilters){
     var out = true;
     if(serverStatusFilters.filterClient != ''){
-        out = (threadData[10] == serverStatusFilters.filterClient);
+        out = (threadData.Client == serverStatusFilters.filterClient);
     }
 
     return out;
@@ -50,7 +67,7 @@ function checkClientFilter(threadData, serverStatusFilters){
 function checkNotNullFilter(threadData, serverStatusFilters){
     var out = true;
     if(serverStatusFilters.notNullOnly){
-        out = (threadData[12] != 'NULL');
+        out = (threadData.Request != 'NULL');
     }
 
     return out;
@@ -134,26 +151,12 @@ function threadData(data) {
     mainTable.find('tbody tr').each(function () {
         var tdList = $(this).find('td');
         if (tdList.length > 0) {
-            var threadData = [
-                $(tdList[0]).text(),
-                $(tdList[1]).text(),
-                $(tdList[2]).text(),
-                $(tdList[3]).text(),
-                $(tdList[4]).text(),
-                $(tdList[5]).text(),
-                $(tdList[6]).text(),
-                $(tdList[7]).text(),
-                $(tdList[8]).text(),
-                $(tdList[9]).text(),
-                $(tdList[10]).text(),
-                $(tdList[11]).text(),
-                $(tdList[12]).text()
-            ];
-            if ((serverStatusFilters.currentClientIpAddress != threadData[10]) && $.inArray(threadData[10], clientList) == -1) {
-                clientList.push(threadData[10]);
+            var threadData = new ThreadData(tdList);
+            if ((serverStatusFilters.currentClientIpAddress != threadData.Client) && $.inArray(threadData.Client, clientList) == -1) {
+                clientList.push(threadData.Client);
             }
             var checkOtherFilter = true;
-            if ((serverStatusFilters.currentClientIpAddress != threadData[10]) &&checkFilter(threadData, serverStatusFilters)) {
+            if ((serverStatusFilters.currentClientIpAddress != threadData.Client) &&checkFilter(threadData, serverStatusFilters)) {
                 threadDataList.push(threadData);
             }
         } else {
@@ -168,8 +171,8 @@ function threadData(data) {
     for (var i = 0; i < threadDataListLength; i++) {
         newTableHtml += '<tr>';
         var threadDataLength = threadDataList[i].length;
-        for (var j = 0; j < threadDataLength; j++) {
-            newTableHtml += '<td>' + threadDataList[i][j] + '</td>';
+        for (var attr in threadDataList[i]) {
+            newTableHtml += '<td>' + threadDataList[i][attr] + '</td>';
         }
         newTableHtml += '</tr>';
     }
@@ -222,37 +225,51 @@ function getServerStatus() {
         }
     });
 }
-
+console.log('Toto1');
 $(function () {
+    console.log('Toto10');
     $(document.body).prepend('<style type="text/css">' + css + '</style>');
+    console.log('Toto11');
     var fileTable = $('table');
+    console.log('Toto12');
     fileTable.attr('class', 'table-striped table-condensed table-bordered');
+    console.log('Toto13');
     serverStatusFilters.displayedMainTable = $(fileTable.get(0));
+    console.log('Toto14');
     serverStatusFilters.displayedWorkersData = $($('pre').get(0));
+    console.log('Toto15');
     serverStatusFilters.notNullOnly = false;
+    console.log('Toto16');
     var isRunning = true;
+    console.log('Toto17');
     var filterClient = '';
+    console.log('Toto18');
     $(document).on('click', '#requestNotNull', function () {
         serverStatusFilters.notNullOnly = !serverStatusFilters.notNullOnly;
     });
+    console.log('Toto19');
     $(document).on('change', '#clientListFilter', function () {
         serverStatusFilters.filterClient = $(this).val();
         if(!serverStatusFilters.isRunning){
             start();
         }
     });
+    console.log('Toto100');
     $(document).on('change', '#refreshRate', function(){
         serverStatusFilters.refreshRate = $(this).val();
         if(!serverStatusFilters.isRunning){
             start();
         }
     });
+    console.log('Toto101');
     $(document).on('click', 'select', function () {
         stop();
     });
+    console.log('Toto102');
     $(document).on('blur', 'select', function () {
         start();
     });
+    console.log('Toto103');
     $(document).on('click', '#startAndStop', function(event){
         event.preventDefault();
         if(serverStatusFilters.isRunning){
@@ -262,15 +279,18 @@ $(function () {
         }
         $('#startAndStop').text(serverStatusFilters.getStartStopButtonText());
     });
-
+    console.log('Toto104');
     var timer = null;
     function start(){
         timer = setInterval(getServerStatus, serverStatusFilters.refreshRate);
         serverStatusFilters.isRunning = true;
     }
+    console.log('Toto105');
     function stop(){
         clearInterval(timer);
         serverStatusFilters.isRunning = false;
     }
     start();
+    console.log('Toto106');
 });
+console.log('Toto107');
